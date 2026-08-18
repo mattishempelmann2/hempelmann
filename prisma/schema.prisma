@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Trip {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  category    String
+  date        DateTime
+  endDate     DateTime?
+  description String?
+  coverPhotoId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  photos Photo[]
+
+  @@index([category])
+  @@index([date])
+}
+
+model Photo {
+  id             String   @id @default(cuid())
+  tripId         String
+  trip           Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  url            String
+  width          Int?
+  height         Int?
+  caption        String?
+  order          Int      @default(0)
+  showOnTimeline Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  @@index([tripId])
+  @@index([showOnTimeline])
+}
+
+model Track {
+  id        String   @id @default(cuid())
+  title     String
+  artist    String?
+  url       String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
