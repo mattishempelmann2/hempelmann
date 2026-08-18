@@ -14,7 +14,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const tracks = await prisma.track.findMany({ orderBy: { order: "asc" } });
+  // Falls back to an empty playlist instead of taking the whole site down —
+  // this query runs on every page (including static ones like /about), so a
+  // transient DB hiccup at build/prerender time shouldn't be fatal.
+  const tracks = await prisma.track
+    .findMany({ orderBy: { order: "asc" } })
+    .catch(() => []);
 
   return (
     <html lang="en" className="h-full antialiased">
